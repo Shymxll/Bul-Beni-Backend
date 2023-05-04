@@ -18,7 +18,7 @@ import com.project.bulbeniback.repos.PostRepository;
 import com.project.bulbeniback.response.PostResponse;
 
 @Service
-public class PostService{
+public class PostService {
     private final PostRepository postRepository;
     private final UserService userService;
 
@@ -27,9 +27,8 @@ public class PostService{
         this.userService = userService;
     }
 
-    
-    //get all posts
-    public  List<PostResponse> getAllPosts(){
+    // get all posts
+    public List<PostResponse> getAllPosts() {
         return this.postRepository.findAll().stream().map(post -> {
             PostResponse postResponse = new PostResponse();
             postResponse.setId(post.getId());
@@ -44,11 +43,11 @@ public class PostService{
             return postResponse;
         }).collect(Collectors.toList());
     }
-    
-    //create post and throw exception if post is not valid
+
+    // create post and throw exception if post is not valid
     public Boolean createPost(PostCreateDto newPost) {
-        try{
-            if((newPost.getWorf() == 1 || newPost.getWorf() == 0 ) && newPost.getTitle() !=null){
+        try {
+            if ((newPost.getWorf() == 1 || newPost.getWorf() == 0) && newPost.getTitle() != null) {
                 Post post = new Post();
                 post.setTitle(newPost.getTitle());
                 post.setContent(newPost.getContent());
@@ -62,44 +61,60 @@ public class PostService{
                 return true;
             }
             return false;
-        }catch(DataIntegrityViolationException e){
+        } catch (DataIntegrityViolationException e) {
             return false;
-        }        
+        }
     }
 
-    //get post by id
-    public void getPostById(long id){
-        this.postRepository.findById(id);
-    }
-
-    //delete post by id
-    public Boolean deletePostById(long id){
-      
-            this.postRepository.deleteById(id);
-           
+    // get post by id
+    public PostResponse getPostById(long id) {
+        Optional<Post> post = this.postRepository.findById(id);
         
-        return true;
+        if (post.isPresent()) {
+            PostResponse postResponse = new PostResponse();
+            postResponse.setId(post.get().getId());
+            postResponse.setUserId(post.get().getUser().getId());
+            postResponse.setTitle(post.get().getTitle());
+            postResponse.setContent(post.get().getContent());
+            postResponse.setWorf(post.get().getWorf());
+            postResponse.setCategory(post.get().getCategory());
+            postResponse.setCity(post.get().getCity());
+            postResponse.setDistrict(post.get().getDistrict());
+            postResponse.setCreatedDate(post.get().getCreatedDate());
+            return postResponse;
+        }
+        return new PostResponse(0, 0, "", "", 0, "", "", "",null);
     }
 
-    //update post by id
-    public Boolean updatePost(PostUpdateDto postUpdateDto){
-        try{
-        Optional<Post> post = this.postRepository.findById(postUpdateDto.getId());
-        if(post.isPresent()){
-            Post uptPost = post.get();
-            uptPost.setTitle(postUpdateDto.getTitle());
-            uptPost.setContent(postUpdateDto.getContent());
-            uptPost.setWorf(postUpdateDto.getWorf());
-            uptPost.setCategory(postUpdateDto.getCategory());
-            uptPost.setCity(postUpdateDto.getCity());
-            uptPost.setDistrict(postUpdateDto.getDistrict());
-            this.postRepository.save(uptPost);
-            
+    // delete post by id
+    public Boolean deletePostById(long id) {
+
+        Optional<Post> post = this.postRepository.findById(id);
+
+        if(post.isPresent()) {
+            this.postRepository.deleteById(id);
+            return true;
         }
-        return true;
-        }catch(Exception e){
+        return false;
+    }
+
+    // update post by id
+    public Boolean updatePost(PostUpdateDto postUpdateDto) {
+       
+            Optional<Post> post = this.postRepository.findById(postUpdateDto.getId());
+            if (post.isPresent() && (postUpdateDto.getWorf() == 1 || postUpdateDto.getWorf() == 0)) {
+                Post uptPost = post.get();
+                uptPost.setTitle(postUpdateDto.getTitle());
+                uptPost.setContent(postUpdateDto.getContent());
+                uptPost.setWorf(postUpdateDto.getWorf());
+                uptPost.setCategory(postUpdateDto.getCategory());
+                uptPost.setCity(postUpdateDto.getCity());
+                uptPost.setDistrict(postUpdateDto.getDistrict());
+                this.postRepository.save(uptPost);
+                return true;
+            }
             return false;
-        }
+        
 
     }
 }
