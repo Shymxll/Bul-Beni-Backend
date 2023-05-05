@@ -18,7 +18,7 @@ public class UserService {
         if(this.userRepository.findById(id).isPresent()){
             return this.userRepository.findById(id).get();
         }
-        return null;
+        return new User();
     }
 
     

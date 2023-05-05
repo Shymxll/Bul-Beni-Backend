@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,17 +15,23 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.project.bulbeniback.dto.PostCreateDto;
 import com.project.bulbeniback.dto.PostUpdateDto;
 import com.project.bulbeniback.entity.Post;
+import com.project.bulbeniback.entity.User;
 import com.project.bulbeniback.repos.PostRepository;
 import com.project.bulbeniback.response.PostResponse;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class PostService {
     private final PostRepository postRepository;
     private final UserService userService;
+    private final StorageService storageService;
 
-    public PostService(PostRepository postRepository, UserService userService) {
+    public PostService(PostRepository postRepository, UserService userService,StorageService storageService) {
         this.postRepository = postRepository;
         this.userService = userService;
+        this.storageService = storageService;
     }
 
     // get all posts
@@ -40,15 +47,19 @@ public class PostService {
             postResponse.setCity(post.getCity());
             postResponse.setDistrict(post.getDistrict());
             postResponse.setCreatedDate(post.getCreatedDate());
+            
             return postResponse;
         }).collect(Collectors.toList());
     }
 
     // create post and throw exception if post is not valid
     public Boolean createPost(PostCreateDto newPost) {
+         
         try {
             if ((newPost.getWorf() == 1 || newPost.getWorf() == 0) && newPost.getTitle() != null) {
+                User user = this.userService.getUserById(newPost.getUserId());
                 Post post = new Post();
+                String imgName = System.currentTimeMillis() + "_" + user.getId();
                 post.setTitle(newPost.getTitle());
                 post.setContent(newPost.getContent());
                 post.setWorf(newPost.getWorf());
@@ -56,9 +67,15 @@ public class PostService {
                 post.setCreatedDate(new Date());
                 post.setCity(newPost.getCity());
                 post.setDistrict(newPost.getDistrict());
-                post.setUser(this.userService.getUserById(newPost.getUserId()));
-                this.postRepository.save(post);
-                return true;
+                post.setUser(user);
+                post.setImgNames(imgName);
+                
+                //img send storage service
+                if(this.storageService.uploadFile(newPost,imgName)==true){
+                    this.postRepository.save(post);
+                    return true;
+                }
+                
             }
             return false;
         } catch (DataIntegrityViolationException e) {
@@ -103,6 +120,7 @@ public class PostService {
        
             Optional<Post> post = this.postRepository.findById(postUpdateDto.getId());
             if (post.isPresent() && (postUpdateDto.getWorf() == 1 || postUpdateDto.getWorf() == 0)) {
+                log.warn("post update");
                 Post uptPost = post.get();
                 uptPost.setTitle(postUpdateDto.getTitle());
                 uptPost.setContent(postUpdateDto.getContent());

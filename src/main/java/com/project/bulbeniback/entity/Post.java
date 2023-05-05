@@ -47,5 +47,7 @@ public class Post {
 
     Date createdDate;
 
+    String imgNames;
+
 
 }
