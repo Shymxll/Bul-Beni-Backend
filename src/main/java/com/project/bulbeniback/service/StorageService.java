@@ -1,6 +1,5 @@
 package com.project.bulbeniback.service;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.springframework.stereotype.Service;
@@ -12,9 +11,6 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.IOUtils;
-import com.project.bulbeniback.dto.PostCreateDto;
-import com.project.bulbeniback.dto.PostUpdateDto;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Service

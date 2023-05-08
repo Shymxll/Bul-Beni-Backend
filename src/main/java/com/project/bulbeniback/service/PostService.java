@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import com.project.bulbeniback.dto.PostCreateDto;
+import com.project.bulbeniback.dto.PostSearchDto;
 import com.project.bulbeniback.dto.PostUpdateDto;
 import com.project.bulbeniback.entity.Post;
 import com.project.bulbeniback.entity.User;
@@ -125,16 +126,6 @@ public class PostService {
             uptPost.setCategory(postUpdateDto.getCategory());
             uptPost.setCity(postUpdateDto.getCity());
             uptPost.setDistrict(postUpdateDto.getDistrict());
-            //set img name if file is not empty and send storage service and get response if true set img name else set empty
-            if (!postUpdateDto.getFile().isEmpty()){
-                //create new img name
-                String newİmgName = System.currentTimeMillis() + "_" + uptPost.getUser().getId();
-                if (this.storageService.updateFile(postUpdateDto.getFile(),post.get().getImgNames(), newİmgName))
-                    uptPost.setImgNames(newİmgName);
-                else
-                    uptPost.setImgNames("");
-            }
-
             this.postRepository.save(uptPost);
             return true;
         }
@@ -142,5 +133,10 @@ public class PostService {
         return false;
 
     }
+
+	public void getPostSerachForSpecial(PostSearchDto postSearchDto) {
+		log.info(this.postRepository.findByWorfAndCityAndDistrictAndCategory(postSearchDto.getWorf(),postSearchDto.getCity(), postSearchDto.getDistrict(), postSearchDto.getCategory()).toString());
+        
+	}
 
 }

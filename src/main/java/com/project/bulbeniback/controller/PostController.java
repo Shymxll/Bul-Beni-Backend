@@ -2,6 +2,7 @@ package com.project.bulbeniback.controller;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.bulbeniback.dto.PostCreateDto;
+import com.project.bulbeniback.dto.PostSearchDto;
 import com.project.bulbeniback.dto.PostUpdateDto;
 import com.project.bulbeniback.response.PostResponse;
 import com.project.bulbeniback.service.PostService;
@@ -25,13 +27,13 @@ public class PostController {
     }
 
     //get all posts
+    @Cacheable("posts")
     @GetMapping("/all")
     public ResponseEntity<List<PostResponse>> getAllPosts(){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(this.postService.getAllPosts());
     }
-    //get post by 
-
+    //get post by id
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponse> getPostById(@PathVariable long postId){
         PostResponse postResponse = this.postService.getPostById(postId) ;
@@ -40,6 +42,9 @@ public class PostController {
         }
         return ResponseEntity.ok(postResponse) ;
     }
+
+    //get posts 
+    
     //create post
     @PostMapping("/create")
     public ResponseEntity<?> createPost( PostCreateDto postCreateDto){
@@ -71,7 +76,12 @@ public class PostController {
         }
     }
 
-    
+    //get posts by category or city or district or worf
+    @PostMapping("/search")
+    public String getPostSerachForSpecial(PostSearchDto postSearchDto){
+       this.postService.getPostSerachForSpecial(postSearchDto);
+        return "true";
+    }
 }
 
 //todo: create controller for post ----> done
@@ -79,4 +89,6 @@ public class PostController {
 //todo: update controller for post ----> done
 //todo: get all posts controller for post ----> done
 //todo: get post by id controller for post ----> done
+//todo: get posts by category,city,district,finded or wanted controller for post
+
 

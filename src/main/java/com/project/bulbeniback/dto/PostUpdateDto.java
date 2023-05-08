@@ -15,6 +15,5 @@ public class PostUpdateDto {
     private String category;
     private String city;
     private String district;
-    private MultipartFile file;
 
 }
