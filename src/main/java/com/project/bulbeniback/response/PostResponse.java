@@ -28,5 +28,7 @@ public class PostResponse {
     String district;
 
     Date createdDate;
+
+    String urlİmg;
     
 }

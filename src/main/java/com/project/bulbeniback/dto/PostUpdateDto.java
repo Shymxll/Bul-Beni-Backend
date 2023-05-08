@@ -1,5 +1,8 @@
 package com.project.bulbeniback.dto;
 
+
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.Data;
 
 @Data
@@ -12,5 +15,6 @@ public class PostUpdateDto {
     private String category;
     private String city;
     private String district;
+    private MultipartFile file;
 
 }
