@@ -1,15 +1,7 @@
-#
-# Build stage
-#
-FROM maven:3.8.2-jdk-17 AS build
-COPY . .
-RUN mvn clean package -Pprod -DskipTests
 
-#
-# Package stage
-#
-FROM openjdk:17-jdk-slim
-COPY --from=build /target/bulbeniback-0.0.1-SNAPSHOT.jar bulbeniback.jar
-# ENV PORT=8080
-EXPOSE 8080
-ENTRYPOINT ["java","-jar","demo.jar"]
+
+FROM eclipse-temurin:17-jdk-alpine
+VOLUME /tmp
+ARG JAR_FILE
+COPY ${JAR_FILE} bulbeniback-0.0.1-SNAPSHOT.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
