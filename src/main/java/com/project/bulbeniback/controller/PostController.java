@@ -3,6 +3,7 @@ package com.project.bulbeniback.controller;
 import java.util.List;
 
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import com.project.bulbeniback.dto.PostUpdateDto;
 import com.project.bulbeniback.response.PostResponse;
 import com.project.bulbeniback.service.PostService;
 import com.project.bulbeniback.service.StorageService;
+
 
 @RestController
 @RequestMapping("/post")
