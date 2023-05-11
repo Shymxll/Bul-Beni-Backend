@@ -8,12 +8,15 @@ import lombok.Data;
 @Data
 public class PostUpdateDto {
     
-    private long id;
-    private String title;
-    private String content;
-    private int worf;
-    private String category;
-    private String city;
-    private String district;
+    long id;
+    long userId;
+    String title;
+    String content;
+    int worf;
+    MultipartFile file;
+    String country;
+    String category;
+    String city;
+    String district;
 
 }

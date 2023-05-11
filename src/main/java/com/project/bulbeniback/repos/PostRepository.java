@@ -13,4 +13,5 @@ public interface PostRepository extends JpaRepository<Post, Long>{
 
 	List<Post> findByWorfAndCityAndDistrictAndCategory(int worf, String city, String district, String category);
     
+	Optional<List<Post>> findByWorf(int worf);
 }

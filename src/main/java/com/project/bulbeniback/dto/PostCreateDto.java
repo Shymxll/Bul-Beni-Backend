@@ -17,6 +17,8 @@ public class PostCreateDto {
 
     int worf; //wanted or finded
 
+    String country;
+
     String category;
 
     String city;

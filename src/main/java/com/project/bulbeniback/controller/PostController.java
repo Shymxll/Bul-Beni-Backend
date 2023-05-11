@@ -2,6 +2,7 @@ package com.project.bulbeniback.controller;
 
 import java.util.List;
 
+import org.springdoc.core.converters.models.Sort;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.bulbeniback.dto.PostCreateDto;
 import com.project.bulbeniback.dto.PostSearchDto;
 import com.project.bulbeniback.dto.PostUpdateDto;
+import com.project.bulbeniback.entity.Post;
 import com.project.bulbeniback.response.PostResponse;
 import com.project.bulbeniback.service.PostService;
 import com.project.bulbeniback.service.StorageService;
@@ -29,7 +31,6 @@ public class PostController {
     }
 
     //get all posts
-    @Cacheable("posts")
     @GetMapping("/all")
     public ResponseEntity<List<PostResponse>> getAllPosts(){
         return ResponseEntity.status(HttpStatus.OK)
@@ -80,10 +81,11 @@ public class PostController {
 
     //get posts by category or city or district or worf
     @PostMapping("/search")
-    public String getPostSerachForSpecial(PostSearchDto postSearchDto){
-       this.postService.getPostSerachForSpecial(postSearchDto);
-        return "true";
+    public List<Post> getPostSerachForSpecial(PostSearchDto postSearchDto){
+       return this.postService.getPostSerachForSpecial(postSearchDto);
+        
     }
+
 }
 
 //todo: create controller for post ----> done

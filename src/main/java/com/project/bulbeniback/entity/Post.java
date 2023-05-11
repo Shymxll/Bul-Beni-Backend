@@ -41,6 +41,8 @@ public class Post {
 
     String category;
 
+    String country;
+
     String city;
 
     String district;

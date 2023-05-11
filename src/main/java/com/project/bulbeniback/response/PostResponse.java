@@ -21,6 +21,8 @@ public class PostResponse {
 
     int worf; //wanted or finded
 
+    String country;
+
     String category;
 
     String city;

@@ -19,7 +19,7 @@ public class StorageService {
 
     private final AmazonS3 amazonS3;
 
-    private static final String BUCKET_NAME = "bulbenibucket";
+    private static final String BUCKET_NAME = "bulbenibucket2";
 
     public StorageService(AmazonS3 amazonS3) {
         this.amazonS3 = amazonS3;
@@ -76,4 +76,15 @@ public class StorageService {
             return false;
         }
 	}
+
+
+
+    public void deleteFile(String imgNames) {
+        try{
+        this.amazonS3.deleteObject(BUCKET_NAME, imgNames);
+        }catch(Exception e){
+        log.warn("file not deleted:" + e.getMessage());
+
+        }
+    }
 }

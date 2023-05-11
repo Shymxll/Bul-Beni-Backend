@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.project.bulbeniback.dto.PostCreateDto;
 import com.project.bulbeniback.dto.PostSearchDto;
@@ -15,6 +16,7 @@ import com.project.bulbeniback.entity.User;
 import com.project.bulbeniback.repos.PostRepository;
 import com.project.bulbeniback.response.PostResponse;
 
+import ch.qos.logback.core.joran.conditional.ElseAction;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -39,6 +41,7 @@ public class PostService {
             postResponse.setTitle(post.getTitle());
             postResponse.setContent(post.getContent());
             postResponse.setWorf(post.getWorf());
+            postResponse.setCountry(post.getCountry());
             postResponse.setCategory(post.getCategory());
             postResponse.setCity(post.getCity());
             postResponse.setDistrict(post.getDistrict());
@@ -62,6 +65,7 @@ public class PostService {
                 post.setWorf(postCreateDto.getWorf());
                 post.setCategory(postCreateDto.getCategory());
                 post.setCreatedDate(new Date());
+                post.setCountry(postCreateDto.getCountry());
                 post.setCity(postCreateDto.getCity());
                 post.setDistrict(postCreateDto.getDistrict());
                 post.setUser(user);
@@ -93,12 +97,14 @@ public class PostService {
             postResponse.setContent(post.get().getContent());
             postResponse.setWorf(post.get().getWorf());
             postResponse.setCategory(post.get().getCategory());
+            postResponse.setCountry(post.get().getCountry());
             postResponse.setCity(post.get().getCity());
             postResponse.setDistrict(post.get().getDistrict());
             postResponse.setCreatedDate(post.get().getCreatedDate());
+            postResponse.setUrlİmg(this.storageService.getUrl(post.get().getImgNames()));
             return postResponse;
         }
-        return new PostResponse(0, 0, "", "", 0, "", "", "", null, null);
+        return new PostResponse(0, 0, "", "", 0, "", "","", "", null, null);
     }
 
     // delete post by id
@@ -108,6 +114,7 @@ public class PostService {
 
         if (post.isPresent()) {
             this.postRepository.deleteById(id);
+            this.storageService.deleteFile(post.get().getImgNames());
             return true;
         }
         return false;
@@ -117,7 +124,7 @@ public class PostService {
     public Boolean updatePost(PostUpdateDto postUpdateDto) {
         
         Optional<Post> post = this.postRepository.findById(postUpdateDto.getId());
-        
+        String imgName = System.currentTimeMillis() + "_" + postUpdateDto.getUserId();
         if (post.isPresent()) {
             Post uptPost = post.get();
             uptPost.setTitle(postUpdateDto.getTitle());
@@ -126,6 +133,27 @@ public class PostService {
             uptPost.setCategory(postUpdateDto.getCategory());
             uptPost.setCity(postUpdateDto.getCity());
             uptPost.setDistrict(postUpdateDto.getDistrict());
+            uptPost.setCountry(postUpdateDto.getCountry());
+            
+            try {
+                
+                if(!postUpdateDto.getFile().isEmpty()){
+                    
+                    if(this.storageService.uploadFile(postUpdateDto.getFile(), imgName)){
+                        this.storageService.deleteFile(post.get().getImgNames());
+                        uptPost.setImgNames(imgName);
+                        
+                    }
+                    
+                }else{
+                    uptPost.setImgNames("");
+                    
+                }
+
+            } catch (Exception e) {
+                return false;
+            }
+            
             this.postRepository.save(uptPost);
             return true;
         }
@@ -134,9 +162,18 @@ public class PostService {
 
     }
 
-	public void getPostSerachForSpecial(PostSearchDto postSearchDto) {
-		log.info(this.postRepository.findByWorfAndCityAndDistrictAndCategory(postSearchDto.getWorf(),postSearchDto.getCity(), postSearchDto.getDistrict(), postSearchDto.getCategory()).toString());
+	public List<Post> getPostSerachForSpecial(PostSearchDto postSearchDto) {
+        Optional<List<Post>> postsOptional = this.postRepository.findByWorf(postSearchDto.getWorf());
+        List<Post> posts = postsOptional.get();
+        String[] keyWords = postSearchDto.getSearchText().split(" ");
+        for (String keyWord : keyWords) {
+           posts = posts.stream().filter(post -> post.getCity().contains(keyWord) || post.getDistrict().contains(keyWord)).collect(Collectors.toList());
+
+        }
+
+        return posts;
         
+
 	}
 
 }

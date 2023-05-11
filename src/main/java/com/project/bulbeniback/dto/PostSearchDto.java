@@ -5,8 +5,10 @@ import lombok.Data;
 @Data
 public class PostSearchDto {
     int worf;
-    String category;
+    String country;
     String city;
     String district;
+    String category;
+    String searchText;
     
 }
