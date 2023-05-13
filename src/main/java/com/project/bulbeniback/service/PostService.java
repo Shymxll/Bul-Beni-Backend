@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.project.bulbeniback.dto.PostCreateDto;
 import com.project.bulbeniback.dto.PostSearchDto;
@@ -15,8 +14,8 @@ import com.project.bulbeniback.entity.Post;
 import com.project.bulbeniback.entity.User;
 import com.project.bulbeniback.repos.PostRepository;
 import com.project.bulbeniback.response.PostResponse;
+import com.project.bulbeniback.util.PostSearchUtil;
 
-import ch.qos.logback.core.joran.conditional.ElseAction;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -56,7 +55,8 @@ public class PostService {
     public Boolean createPost(PostCreateDto postCreateDto) {
         User user = this.userService.getUserById(postCreateDto.getUserId());
         try {
-            if ((postCreateDto.getWorf() == 1 || postCreateDto.getWorf() == 0) && postCreateDto.getTitle() != null && user.getId() != 0) {
+            if ((postCreateDto.getWorf() == 1 || postCreateDto.getWorf() == 0) && postCreateDto.getTitle() != null
+                    && user.getId() != 0) {
 
                 Post post = new Post();
                 String imgName = System.currentTimeMillis() + "_" + user.getId();
@@ -104,7 +104,7 @@ public class PostService {
             postResponse.setUrlİmg(this.storageService.getUrl(post.get().getImgNames()));
             return postResponse;
         }
-        return new PostResponse(0, 0, "", "", 0, "", "","", "", null, null);
+        return new PostResponse(0, 0, "", "", 0, "", "", "", "", null, null);
     }
 
     // delete post by id
@@ -122,7 +122,7 @@ public class PostService {
 
     // update post by id
     public Boolean updatePost(PostUpdateDto postUpdateDto) {
-        
+
         Optional<Post> post = this.postRepository.findById(postUpdateDto.getId());
         String imgName = System.currentTimeMillis() + "_" + postUpdateDto.getUserId();
         if (post.isPresent()) {
@@ -134,46 +134,42 @@ public class PostService {
             uptPost.setCity(postUpdateDto.getCity());
             uptPost.setDistrict(postUpdateDto.getDistrict());
             uptPost.setCountry(postUpdateDto.getCountry());
-            
+
             try {
-                
-                if(!postUpdateDto.getFile().isEmpty()){
-                    
-                    if(this.storageService.uploadFile(postUpdateDto.getFile(), imgName)){
+
+                if (!postUpdateDto.getFile().isEmpty()) {
+
+                    if (this.storageService.uploadFile(postUpdateDto.getFile(), imgName)) {
                         this.storageService.deleteFile(post.get().getImgNames());
                         uptPost.setImgNames(imgName);
-                        
+
                     }
-                    
-                }else{
+
+                } else {
                     uptPost.setImgNames("");
-                    
+
                 }
 
             } catch (Exception e) {
                 return false;
             }
-            
+
             this.postRepository.save(uptPost);
             return true;
         }
-       
+
         return false;
 
     }
 
-	public List<Post> getPostSerachForSpecial(PostSearchDto postSearchDto) {
-        Optional<List<Post>> postsOptional = this.postRepository.findByWorf(postSearchDto.getWorf());
-        List<Post> posts = postsOptional.get();
-        String[] keyWords = postSearchDto.getSearchText().split(" ");
-        for (String keyWord : keyWords) {
-           posts = posts.stream().filter(post -> post.getCity().contains(keyWord) || post.getDistrict().contains(keyWord)).collect(Collectors.toList());
-
-        }
-
-        return posts;
+    public List<Post> getPostSerachForSpecial(PostSearchDto postSearchDto) {
+         List<Post> posts = this.postRepository.findByWorf(postSearchDto.getWorf()).get();
+         
+         posts = PostSearchUtil.searchWithFilter(postSearchDto, posts);
+        
         
 
-	}
+        return posts;
+    }
 
 }
