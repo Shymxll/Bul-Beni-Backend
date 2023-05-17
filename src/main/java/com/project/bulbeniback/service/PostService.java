@@ -1,5 +1,6 @@
 package com.project.bulbeniback.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -163,10 +164,20 @@ public class PostService {
     }
 
     public List<Post> getPostSerachForSpecial(PostSearchDto postSearchDto) {
-         List<Post> posts = this.postRepository.findByWorf(postSearchDto.getWorf()).get();
-         
-         posts = PostSearchUtil.searchWithFilter(postSearchDto, posts);
-        
+        List<Post> posts = new ArrayList<>();   
+        try{
+           
+            
+            if(!postSearchDto.getSearchText().equals(""))
+                posts = this.postRepository.findByTitleContaining(postSearchDto.getSearchText());
+            else if(postSearchDto.getWorf() == 0 || postSearchDto.getWorf() == 1)
+                posts = this.postRepository.findByWorf(postSearchDto.getWorf()).get();
+                
+         PostSearchUtil.searchWithFilter(postSearchDto, posts);
+        }
+        catch(Exception e){
+            log.warn("post search error: " + e.getMessage());
+        }
         
 
         return posts;

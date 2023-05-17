@@ -44,7 +44,7 @@ public class Post {
     String country;
 
     String city;
-
+    //get 
     String district;
 
     Date createdDate;

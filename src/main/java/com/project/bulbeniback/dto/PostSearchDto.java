@@ -10,5 +10,6 @@ public class PostSearchDto {
     String district;
     String category;
     String searchText;
+    
 
 }

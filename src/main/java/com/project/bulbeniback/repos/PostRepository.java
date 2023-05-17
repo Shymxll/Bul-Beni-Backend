@@ -12,4 +12,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
 	Optional<List<Post>> findByWorf(int worf);
 
+    List<Post> findByTitleContaining(String title);
+
 }
