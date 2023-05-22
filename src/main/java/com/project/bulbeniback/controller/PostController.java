@@ -92,4 +92,4 @@ public class PostController {
 // todo: get all posts controller for post ----> done
 // todo: get post by id controller for post ----> done
 // todo: get posts by category,city,district,finded or wanted controller for
-// post
+
