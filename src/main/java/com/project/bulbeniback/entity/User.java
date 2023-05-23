@@ -23,9 +23,9 @@ public class User{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
    
-    String name;
+    String firstName;
 
-    String surname;
+    String lastName;
    
     String username;
    
@@ -33,10 +33,9 @@ public class User{
    
     String password;
    
-    String role;
+    String roles;
    
-    String token; //I havent decided yet if I will use this field
-
+  
 
 
 }
